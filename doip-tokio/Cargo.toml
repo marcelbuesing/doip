@@ -1,0 +1,37 @@
+[package]
+name = "doip-tokio"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Client and server implementation for DoIP (diagnostic communication over IP), used in the automotive domain."
+authors = ["marcelbuesing <buesing.marcel@googlemail.com>"]
+keywords = ["doip", "do-ip", "automotive", "ecu"]
+
+[dependencies]
+anyhow = "1.0"
+async-trait = "0.1"
+async-stream = "0.3"
+bytes = "1.1"
+doip = { path = "../doip" }
+futures = "0.3"
+# required for set_reuseaddr
+socket2 = "0.4"
+thiserror = "1.0"
+tls-api = { version = "0.7", optional = true }
+tls-api-stub = { version = "0.7.0", optional = true }
+tokio = { version = "1.0", features = ["full"] }
+tokio-util = { version = "0.7", features = ["net", "codec"] }
+tracing = "0.1"
+
+[features]
+default = ["tls"]
+tls = ["tls-api", "tls-api-stub"]
+# Offer non tls methods, network traffic is unprotected!
+insecure = []
+
+[dev-dependencies]
+# tls-api-rustls = "0.7"
+# rustls = "0.20.2"
+tls-api-openssl = "0.7.0"
+openssl = "0.10.38"
+tracing-subscriber = "0.3"

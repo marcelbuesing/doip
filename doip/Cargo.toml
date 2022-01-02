@@ -1,0 +1,23 @@
+[package]
+name = "doip"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "DoIP (diagnostic communication over IP) types, used in the automotive domain."
+authors = ["marcelbuesing <buesing.marcel@googlemail.com>"]
+keywords = ["doip", "do-ip", "automotive", "ecu"]
+
+[dependencies]
+byteorder = { version = "1.4", optional = true, default-features = false }
+core2 = { version = "0.4", optional = true }
+# TODO remove for no_std
+thiserror = "1.0"
+
+
+[features]
+default = ["std"]
+
+alloc = ["core2/alloc"]
+
+std = ["alloc", "byteorder/std"]
+no_std = ["core2", "byteorder"]
