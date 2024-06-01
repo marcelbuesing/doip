@@ -11,45 +11,64 @@ use openssl::{
 };
 use std::net::{IpAddr, Ipv4Addr};
 use tls_api::TlsAcceptorBuilder;
+use tls_api_openssl::TlsAcceptor;
 
 // Self signed test certificate
-// openssl genrsa -out private.key 1024
+// openssl genrsa -out private.key 2048
 // openssl req -new -x509 -key private.key -out public.cer -days 3065
 const CERT_PEM: &[u8] = b"-----BEGIN CERTIFICATE-----
-MIICjjCCAfegAwIBAgIUSe79Sk8pCvU/kjetfZgYZ4Ago9YwDQYJKoZIhvcNAQEL
-BQAwWTELMAkGA1UEBhMCQVUxEzARBgNVBAgMClNvbWUtU3RhdGUxITAfBgNVBAoM
-GEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZDESMBAGA1UEAwwJbG9jYWxob3N0MB4X
-DTIyMDEwNzA3MzUwOFoXDTMwMDUzMDA3MzUwOFowWTELMAkGA1UEBhMCQVUxEzAR
-BgNVBAgMClNvbWUtU3RhdGUxITAfBgNVBAoMGEludGVybmV0IFdpZGdpdHMgUHR5
-IEx0ZDESMBAGA1UEAwwJbG9jYWxob3N0MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCB
-iQKBgQC8kbuWCl0FLiXfLacw0NlLNoMAok96jorJd7ictnzgKbfMVOwY8d7LzV9g
-B8ucVpE2DV66cyXRz2N+b/iDtExSQmGuRb4IzZ+oALKoUltsTTdpoITc7an/JG7E
-HxbK65rwI8JNY8HuoavVjMskO22DhVhX83aALHwMj9aWZYgmUQIDAQABo1MwUTAd
-BgNVHQ4EFgQUXLF5Q2C+awTFUUHeLRxqxxBaBF0wHwYDVR0jBBgwFoAUXLF5Q2C+
-awTFUUHeLRxqxxBaBF0wDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOB
-gQCO3dYhunJ+EuC8xJ1f4ONDeOmwd5q+xXMMaK0xLj0n7gDn1ZnEw1ZGEpyvYDF8
-/gCmpMbcEbFMyLnM7Ot2QpMKR21mYYwDUKtkc/WQUt/EsQvfqXmMaTj6F1ARo6n8
-he4xNXO5LktC09jlipmo6IH0tC+98p8BiYN44yB9zDJasA==
+MIIDazCCAlOgAwIBAgIUNkFZDE5WiD1w5QrGG7HEfxH9nhwwDQYJKoZIhvcNAQEL
+BQAwRTELMAkGA1UEBhMCQVUxEzARBgNVBAgMClNvbWUtU3RhdGUxITAfBgNVBAoM
+GEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZDAeFw0yNDA2MDEwODMzMDRaFw0zMjEw
+MjIwODMzMDRaMEUxCzAJBgNVBAYTAkFVMRMwEQYDVQQIDApTb21lLVN0YXRlMSEw
+HwYDVQQKDBhJbnRlcm5ldCBXaWRnaXRzIFB0eSBMdGQwggEiMA0GCSqGSIb3DQEB
+AQUAA4IBDwAwggEKAoIBAQDOwiViae6ofH1+iYXokBag/mGvN03k91H/zsPDnf/Q
+dWPMDv0/b25/TQquXEAfItHBLtTFTLXmIL1uwVLZ7n/RGHsoKsTrAbkxvP0HFdA8
+uAJzD7w1VOc2Pv4dJLygb/okfNJY90+il2D2s0cBAo1GmtsyjpwizdVoz0mFcfmK
+k02yvr1Ida+Drzy6HAygbstoBAcIr48xP3ANAcaxqLPUpmLtfozTL6MpuzIZgmat
+XpJKSr297M+DTufxAH8xicDVdudHr3yw8H2Nl18UUdKwOinZtdgtbar4k/x63fOP
+N/fQY6xV2uaGWk3pRaYQJXLS867CR/F7iEJ6EkzO/e+9AgMBAAGjUzBRMB0GA1Ud
+DgQWBBQ35pE/ethhmef+rKYrLSAgosvjWzAfBgNVHSMEGDAWgBQ35pE/ethhmef+
+rKYrLSAgosvjWzAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA4IBAQAU
+6wGWczJLTm0qX7xPeqyC2Qhc5HPMLt1g+QOo3YQlQ6koulWlVJxLb4mP7yaFAXsn
+WpGAwIyJxR/Ko8aYJrMMRfkh7BrSHn/nhCMBZW7kulxXfWxOi4FxpxEyRfi5ofUe
+MkPjq61h8OfqXl8W+7HWR2Q+ts4THf5TNYSBjZ/KUyYMhoxzg5Y+s9KrI5jxy05z
+pPunXsirV3GY2BwkHssn8UnjXRNOtSfrLphhkGaqW2xQtCCiFZR7E5lLu/ogs1cY
+jqZTzwmqG3d+UUVWCRNMfk7GTxhC3jRNHqyGnGURc3CIZR36Wl8U1bVw/3NE4xG/
+99SiK5EnPuu/t+wBU+dc
 -----END CERTIFICATE-----";
 
 // Self signed test certificate
-// openssl genrsa -out private.key 1024
+// openssl genrsa -out private.key 2048
 // openssl req -new -x509 -key private.key -out public.cer -days 3065
-const CERT_PRIVATE_KEY: &[u8] = b"-----BEGIN RSA PRIVATE KEY-----
-MIICXAIBAAKBgQC8kbuWCl0FLiXfLacw0NlLNoMAok96jorJd7ictnzgKbfMVOwY
-8d7LzV9gB8ucVpE2DV66cyXRz2N+b/iDtExSQmGuRb4IzZ+oALKoUltsTTdpoITc
-7an/JG7EHxbK65rwI8JNY8HuoavVjMskO22DhVhX83aALHwMj9aWZYgmUQIDAQAB
-AoGAGo9wW6bkCUnBvdjBVufj42svMpSqGzoepFf/ods2ZaCaqeZARxcyaYRo7a7L
-aB7tXy6s7Bgx+IZ8nh+JYouvwBxo85EFFMjLSXtPJ3b/K7H0QMSQB4H1kc4bYpMw
-GHfJVUuF0/UBvqY6NMuz+IYbjOfoYQho9kWwimwF+hGEnMECQQDoiMNEo/qI4eFO
-tRFq3YMIzhDFXAk8HKMLdzhPHN7ap7Eb9UvPCeURMVBjyjNLQrLoL0N5lu/Z26Dm
-bCGnk06ZAkEAz5kwZGT3jxcttJuIeqa+ADfoUniOavFXq1Wm3RNAZ4l4vv/Mj4qJ
-omz1UEB4aPDackALVIR/oyrb2jbX0SgAeQJAZSZ4qncaGEkJlQ82kGHjCgV5TiCG
-89sRIX+uwtswJbUkWaEOZPVM63mkGoRuY6KT6GQG2fFKTF45U4Jd8WMmoQJBAKfF
-gZphDsCRVtqzJ6UXxE2g4RxlWZOL3/ITknrv6AjEzNRvHf6TU4/0xnxI3gbRP3k9
-0OpI+m3/YRYFZH0f+uECQHw6eIrbkuqxkL9nU7QX+/O6TXZssunhNuXlpZ2430kj
-Zo314O/h3YMxKRWqe+7o5iJlFROUoEo7FUm1NLDGy/U=
------END RSA PRIVATE KEY-----";
+const CERT_PRIVATE_KEY: &[u8] = b"-----BEGIN PRIVATE KEY-----
+MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDOwiViae6ofH1+
+iYXokBag/mGvN03k91H/zsPDnf/QdWPMDv0/b25/TQquXEAfItHBLtTFTLXmIL1u
+wVLZ7n/RGHsoKsTrAbkxvP0HFdA8uAJzD7w1VOc2Pv4dJLygb/okfNJY90+il2D2
+s0cBAo1GmtsyjpwizdVoz0mFcfmKk02yvr1Ida+Drzy6HAygbstoBAcIr48xP3AN
+AcaxqLPUpmLtfozTL6MpuzIZgmatXpJKSr297M+DTufxAH8xicDVdudHr3yw8H2N
+l18UUdKwOinZtdgtbar4k/x63fOPN/fQY6xV2uaGWk3pRaYQJXLS867CR/F7iEJ6
+EkzO/e+9AgMBAAECggEADjZ5iD/ExzdoOgn9QZzMDWzx1/AFjliI/hHKJ8OP9FYU
+J5DH4bPeL5PjHilwbU4rseuvS9Ec4kZRt1AZ9aoH28lix+1UDt1AtuBUBXK/Vzkv
++UBgPUtKPz1KeG7lejg7BLCW62+JaCF0qdNuQq3DT+fxFaiI0k9TclUTgP/yJI92
+x0TknvUYwgzJQ9JDqe8SwqpBZudCvdW9HtX1ZatCbSfU9cKekHJ4+vs6zN2GfI3k
+24D4d6iz2ZRKmdQWzLlyUpvooV9YOqWE+EkWFzO0CE9XjeWvIU6BSMceOx4+hpjf
+407v5A/sE3hmC+N1TRwtEN1H64CbZZcvlr9R2vl2wQKBgQD57/29RuizLBsL2mXQ
+8MgAVB8WfVOiNQ/80nxUKXEobmCAeR3rBYHjXagivbgin4JjIhUmtyX3dBrtwM1m
+A6cPU2Vvxg1dxAU2IAgkkde/IdmGFc4MNsqfXDahiq8RDscKdbr1L1/pou16Rvsd
+BI2gJiHQ4FoPBp36jTxOh9/iwQKBgQDTxgfQiGSQ/e4/6Ek2CPdr1Kll0k9HWsfY
+1h301VaPh2MZoYGHgQeRymyP1D1t8/4h7DeK5YF0rj9RWvRB1W25/teU/eytsrFZ
+XgPGCSr3w240cQlpZsl2kTV6XieQra3i/zWq0I2b6LAEJpG+rd8ZeyiymWLgz8+f
+7T0nFbuX/QKBgQC4EkGjhneWjWMV5bCaotoJM+r5Wy+fBMlTf4lFSogmKLQ1qf2Y
+uyOf2bgcbfEQvrz+WXmOW9BAYGf8tcQP35zHsrnACfKKHfVgmVKl7CsifsF++MwZ
+PrkXiIhLjKHGREXetDoOnOdcYDvZlDEYe+P6EFtTRAfPjSYIAsBpbbQ7gQKBgHvd
+TBzQaeHUZFHEz21neS/8xsfjZrNZiaJuOj9FuMdibLhFGrni4kaHm0/U18lD+NRm
+kWYQLtPMRwSSqmMHLpKnV/ixPImsBsc6kgJ2wkcAa6kIpHSdxiAvdpQIFiQtMZOf
+qggqy2jxhGIpHP3mPKNuwbMUvBy577qezDHcKEkRAoGBAM1ebVD1mgeMJAxLPnk1
+zx/UsVlml1kSobPrwp81B5tVZv04WwDVWhiNuxXYr7GH3Vsz6N0N+uEBs7544Cbu
+Cv86P3V29e/+T6O0ThwjWrqhDu79S0YwzIxElrvwuTiS4+F0DP0MsGc4yhfJ/2yu
+bMSbuMwPEEFzOMmdqMByMvbo
+-----END PRIVATE KEY-----";
 
 struct DoIpHeaderServerHandlerImpl {}
 
@@ -109,7 +128,7 @@ async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt::init();
 
     let tls_acceptor_builder = tls_acceptor_builder_openssl()?;
-    let tls_acceptor = tls_acceptor_builder.build()?;
+    let tls_acceptor = TlsAcceptor(tls_acceptor_builder.0.build());
 
     let handler = DoIpHeaderServerHandlerImpl {};
     let addr = IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0));
